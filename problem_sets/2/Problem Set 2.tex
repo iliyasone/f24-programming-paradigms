@@ -1,0 +1,112 @@
+\documentclass[dvipsnames]{article}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+
+% Set page size and margins
+% Replace `letterpaper' with`a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{minted}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+\usepackage[backend=biber]{biblatex}
+
+\newcommand{\haskell}[1]{\mintinline{haskell}{#1}}
+\newcommand{\racket}[1]{\mintinline{racket}{#1}}
+\newcommand{\prolog}[1]{\mintinline{prolog}{#1}}
+
+\DeclareMathOperator{\xor}{\mathsf{xor}}
+\DeclareMathOperator{\tru}{\mathsf{tru}}
+\DeclareMathOperator{\fls}{\mathsf{fls}}
+
+% \title{Week 2. Problem set}
+% \author{Nikolai Kudasov}
+% \date{Sep 5, 2024 (submission deadline — Sep 7, 2024)}
+
+\addbibresource{../references.bib}
+
+\begin{document}
+% \maketitle
+\;
+\vspace{0.5cm}
+
+\section*{Week 2. Problem set}
+
+\thispagestyle{fancy}
+\lhead{\includegraphics[height=1.5cm]{../images/innopolis-logo}}
+\rhead{\includegraphics[height=2cm]{../images/course-logo-transparent}}
+\cfoot{Programming Paradigms Fall 2024, Innopolis University}
+
+\begin{enumerate}
+  \item Implement the following functions over lists of symbols in Racket using \textbf{explicit recursion} (i.e. \textbf{without} using higher-order functions like \racket{apply}, \racket{map}, \racket{andmap}, \racket{ormap}, \racket{filter}, and \racket{foldl}).
+  Each function must be implemented independently.
+  Use tail recursion whenever it helps produce a more efficient implementation:
+    \begin{enumerate}
+      \item Find the most frequent symbol in a list (return the first one when ambiguous):
+        \begin{minted}{racket}
+          (most-frequent '(h e l l o w o r l d)) ; ==> 'l
+        \end{minted}
+      \item Annotate each symbol in a list with its occurrence in the list:
+        \begin{minted}{racket}
+          (annotate-occurrence '(h e l l o w o r l d))
+          ; ==> '((h 1) (e 1) (l 1) (l 2) (o 1) (w 1) (o 2) (r 1) (l 3) (d 1))
+        \end{minted}
+        \item Convert a trinary\footnote{See \url{https://en.wikipedia.org/wiki/Ternary_numeral_system}.} string represented as a list of \racket{0}s, \racket{1}s, and \racket{2}s into a (decimal) number:
+        \begin{minted}{racket}
+          (trinary-to-decimal '(1 0 2 1 0)) ; ==> 102
+        \end{minted}
+      \item Return the 3rd to last symbol in a list (you \emph{may} assume it has enough symbols):
+        \begin{minted}{racket}
+          (third-to-last '(1 1 1 0 1 1)) ; ==> 0
+          (third-to-last '(s y m b o l)) ; ==> 'b
+        \end{minted}
+      \item Decrement a binary number. Decrementing zero should produce zero:
+        \begin{minted}{racket}
+          (decrement '(1 0 1 1 0)) ; ==> '(1 0 1 0 1)
+          (decrement '(1 0 0 0 0)) ; ==> '(1 1 1 1)
+          (decrement '(0))         ; ==> '(0)
+        \end{minted}
+    \end{enumerate}
+
+  \item Implement in Racket a function \racket{max-and-sum} that computes a maximum and a sum of a list of numbers. \\
+    For example,
+    \racket{(max-and-sum (list 6 2 4 1))} should compute \racket{'(6 13)}.
+    \begin{enumerate}
+      \item Implement \racket{max-and-sum} using explicit recursion (i.e. \textbf{without} higher-order functions).
+      \item Use the \emph{Substitution Model}~\cite[\S 1.1.5]{AbelsonSussman1996sicp} to verify that \racket{(second (max-and-sum (list x y z)))} is equal to \racket{(+ x y z)}
+      for all \racket{x}, \racket{y}, and \racket{z}.
+      \item Argue whether tail recursion can be used to optimize your implementation.
+    \end{enumerate}
+
+    \item Consider the following definitions in Racket:
+    \begin{minted}{racket}
+    (define (dinc n) (+ n 2))
+
+    (define (f n)
+      (cond
+        [(>= n 10) (- n 10)]
+        [else (* (f (dinc (dinc n))) (f (dinc n)))]))
+    \end{minted}
+    Using the \emph{Substitution Model}~\cite[\S 1.1.5]{AbelsonSussman1996sicp},
+    explain step-by-step how the following expression
+    is computed (you can evaluate \racket{cond}-expressions immediately,
+    but evaluation of function calls to \racket{f} and \racket{dinc} have to be explicit):
+    \begin{minted}{racket}
+    (f 3)
+    \end{minted}
+\end{enumerate}
+
+\section*{References}
+\printbibliography[heading=none]
+
+\end{document}

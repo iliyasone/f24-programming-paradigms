@@ -1,0 +1,201 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{fancyhdr}
+
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Ilias Dzhabbarov, SD-03}
+\fancyhead[R]{31 August 2024}
+
+\begin{document}
+
+\section*{Week 1. Problem set}
+
+\begin{enumerate}
+    \item Which of the following $\lambda$-terms are \emph{closed} \cite[§5.1]{1}? Justify your answer.
+    \begin{enumerate}
+        \item $\lambda a.(\lambda a.b) \, a$
+        \item $\lambda d.x \, (\lambda d.d)$
+        \item $\lambda x.(\lambda x.x) \, x$
+    \end{enumerate}
+
+    \subsubsection*{Solution:}
+    \begin{enumerate}
+        \item let's start with inner term $(\lambda a.b) \, a$. we can assume that this is func that takes some 
+        argument $a$ and retuns term $b$ from the outer scope. And this func immediatly called, so it is just $b$
+        \begin{center}
+            $(\lambda a.b) \, a = b$
+        \end{center}
+        so we have
+        \begin{center}
+            $\lambda a.(\lambda a.b) \, a \leftrightarrow \lambda a.b$
+        \end{center}
+        and obviously we have $b$ from outer scope
+        \subsection*{Answer: Not closed}
+        \item short explanation: $x$ is not an parameter of any lambda function, so it must be
+        from outer scope
+        \begin{center}
+            $\lambda d.x \, (\lambda d.d)$
+        \end{center}
+        \subsection*{Answer: Not closed}
+        \item By the same logic as in (a), we can assume
+        \begin{center}
+            $(\lambda x.x) \, x = x$
+        \end{center} 
+        so we have
+        \begin{center}
+            $\lambda x. x$
+        \end{center} 
+        No other variables, obviously closed
+        \subsection*{Answer: Closed}
+    \end{enumerate}
+
+
+    
+    \item Write down the \emph{call-by-value} evaluation sequence for the following $\lambda$-terms. Each step of the evaluation must correspond to a single $\beta$-reduction or an $\alpha$-conversion. You may introduce aliases for subterms.
+    \subsubsection*{Solution:}
+    \begin{enumerate}
+        \item $(\lambda x.\lambda y.x) \, (\lambda z.y) \, (\lambda z.z) \, w$
+        
+        \begin{enumerate}
+            \item $\beta$: $(\lambda x.\lambda \underline{y}.x) \, (\lambda z.y) \rightarrow $ $[x \mapsto (\lambda z.y)]\lambda \underline{y}.x$ $\rightarrow \lambda \underline{y}.\lambda z.y$\\
+            underlined $\underline{y}$ and $z$ are variables that never used so let's rename them to the "\_" to keep things clear
+            \item $\alpha$: $\lambda \underline{y}.\lambda z.y$ $\rightarrow$ $\lambda \_.\lambda \_.y$\\
+            now we left with:
+            \begin{center}
+                $(\lambda \_.\lambda \_.y) \, (\lambda z.z) \, w$
+            \end{center}
+            so we just put two things in the function one after the other and obviously we will get $y$
+
+            \item $\beta$: $(\lambda \_.\lambda \_.y) \, (\lambda z.z)$ $\rightarrow$ $...$ $\rightarrow$ $\lambda \_.y$ 
+            \item $\beta$: $(\lambda \_.y) \, w$ $\rightarrow$ $...$  $\rightarrow$ $y$
+            \subsection*{Answer: $y$}
+        \end{enumerate}
+
+        \item $(\lambda b.\lambda x.\lambda y.b \, y \, x)$ $(\lambda x.\lambda y.y)$
+        \begin{enumerate}
+            \item $\beta$: 
+            $(\lambda b.\lambda x.\lambda y.b \, y \, x)$ $(\lambda x.\lambda y.y)$ 
+            $\rightarrow$ $[b \mapsto (\lambda x.\lambda y.y)]$
+            $\rightarrow$ $\lambda x.\lambda y.(\lambda x.\lambda y.y) \, y \, x$
+            \item $\beta$ (innner-part): $(\lambda x.\lambda y.y) \, y \, x$
+            $\rightarrow$ $[x \mapsto y](\lambda x.\lambda y.y) \, x$
+            $\rightarrow$ $(\lambda y.y) \, x$
+            \item $\beta$ $(\lambda y.y) \, x$ $\rightarrow$ $...$ $\rightarrow$ $x$
+            \begin{center}
+                $\lambda x.\lambda y. x$
+            \end{center}
+            \subsection*{Answer: $\lambda x.\lambda y. x$ (or $\texttt{tru}$)}
+        \end{enumerate}        
+
+    
+
+        \item $(\lambda s.\lambda z.s \, (s \, z)) \, (\lambda b.\lambda x.\lambda y.b \, y \, x) \, (\lambda x.\lambda y.y)$
+    \begin{enumerate}
+        \item $\beta$: 
+        $((\lambda s. \lambda z. s \, (s \, z)) \, (\lambda b.\lambda x.\lambda y.b \, y \, x)) \, (\lambda x.\lambda y.y)$
+        $\rightarrow$ $[\lambda s \mapsto (\lambda b.\lambda x.\lambda y.b \, y \, x)]$
+        $\rightarrow$ $(\lambda z. (\lambda b.\lambda x.\lambda y.b \, y \, x) \, ((\lambda b.\lambda x.\lambda y.b \, y \, x) \, z)) \, (\lambda x.\lambda y.y)$
+        
+        \item $\beta$:
+        $(\lambda z. (\lambda b.\lambda x.\lambda y.b \, y \, x) \, (\lambda x.\lambda y.(z \, y \, x))) \, (\lambda x.\lambda y.y)$
+        $\rightarrow$ $[z \mapsto (\lambda x.\lambda y.y)]$
+        $\rightarrow$ $(\lambda b.\lambda x.\lambda y.b \, y \, x) \, (\lambda x.\lambda y.(\lambda x.\lambda y.y) \, y \, x)$
+        
+        \item $\alpha$: Renaming to avoid collision
+        $\rightarrow$ $(\lambda b.\lambda x.\lambda y.b \, y \, x) \, (\lambda x_1.\lambda x_0.((z \, x_0) \, x_1))$
+        
+        \item $\beta$: 
+        $(\lambda x.\lambda y.((\lambda x_1.\lambda x_0.(\lambda x.\lambda y.y \, x_0 \, x_1)) \, y \, x))$
+        $\rightarrow$ $[\lambda x \mapsto y]$
+        $\rightarrow$ $(\lambda x.\lambda y.((\lambda x_0.(z \, x_0 \, y)) \, x))$
+        
+        \item $\beta$:
+        $(\lambda x.\lambda y.(z \, x \, y)) \, (\lambda x.\lambda y.y)$
+        $\rightarrow$ $[\lambda z \mapsto (\lambda x.\lambda y.y)]$
+        $\rightarrow$ $(\lambda x.\lambda y.y)$
+        
+        \item $\alpha$: Renaming for clarity
+        $\rightarrow$ $(\lambda x.\lambda x_2.x_2)$
+        
+        \item $\beta$:
+        $(\lambda x.\lambda y.((\lambda x.\lambda x_2.x_2) \, x \, y))$
+        $\rightarrow$ $(\lambda x.\lambda y.(\lambda x_2.x_2 \, y))$
+        $\rightarrow$ $(\lambda x.\lambda y.y)$
+        
+        \subsection*{Answer: $\lambda x.\lambda y.y$  (or $\texttt{fls}$)}
+    \end{enumerate}
+
+    \end{enumerate}
+    
+    
+    \item Recall that with Church booleans \cite[§5.2]{1} we have the following encoding:
+    \[
+    \text{tru} = \lambda t.\lambda f.t
+    \]
+    \[
+    \text{fls} = \lambda t.\lambda f.f
+    \]
+    \begin{enumerate}
+        \item Using only bare $\lambda$-calculus (variables, $\lambda$-abstraction and application), write down a $\lambda$-term for logical equivalence (\texttt{eq}) of two Church booleans. You may \emph{not} use aliases.
+        \item Verify your implementation of \texttt{eq} by writing down the evaluation sequence for the term \texttt{eq fls tru}. You must expand this term and then evaluate \emph{without} aliases.
+        \subsubsection*{Solution:}
+        \texttt{not} = $\lambda a. a $ \texttt{fls} \texttt{tru} = ($\lambda a. a $ $(\lambda t.\lambda f.f)$ $(\lambda t.\lambda f.t)$)\\
+        \texttt{eq} = $\lambda p.\,\lambda q.\,p\,q$ (\texttt{not} $q$) =  $\lambda p.\,\lambda q.\,p\,q$ (($\lambda a. a $ $(\lambda t.\lambda f.f)$ $(\lambda t.\lambda f.t)$) $q$)
+        \texttt{eq fls tru} = ($\lambda p.\,\lambda q.\,p\,q$ (($\lambda a. a $ $(\lambda t.\lambda f.f)$ $(\lambda t.\lambda f.t)$) $q$))
+        $(\lambda t.\lambda f.f)$
+        $(\lambda t.\lambda f.t)$
+
+        Evaluation:
+
+        $
+        (((\lambda p. (\lambda q. ((p q) ((\lambda a. 
+        ((a (\lambda t. (\lambda f. f))) 
+        (\lambda t. (\lambda f. t)))) q)))) (\lambda t. (\lambda f. f))) (\lambda t. (\lambda f. t)))
+        \\ \rightarrow (((\lambda p. (\lambda q. ((p q) ((q (\lambda t. (\lambda f. f))) (\lambda t. (\lambda f. t)))))) 
+        (\lambda t. (\lambda f. f))) (\lambda t. (\lambda f. t)))
+        \\ \rightarrow (((\lambda p. (\lambda q. ((p q) ((q (\lambda t. (\lambda f. f))) (\lambda t. (\lambda f. t)))))) 
+        (\lambda t. (\lambda x_0. x_0))) (\lambda t. (\lambda f. t)))
+        \\ \rightarrow ((\lambda q. (((\lambda t. (\lambda x_0. x_0)) q) ((q (\lambda t. (\lambda f. f))) (\lambda t. 
+        (\lambda f. t))))) (\lambda t. (\lambda f. t)))
+        \\ \rightarrow ((\lambda q. ((\lambda x_0. x_0) ((q (\lambda t. (\lambda f. f))) (\lambda t. (\lambda f. t))))) 
+        (\lambda t. (\lambda f. t)))
+        \\ \rightarrow ((\lambda q. ((q (\lambda t. (\lambda f. f))) (\lambda t. (\lambda f. t)))) 
+        (\lambda t. (\lambda f. t)))
+        \\ \rightarrow ((\lambda q. ((q (\lambda t. (\lambda f. f))) (\lambda t. (\lambda f. t)))) 
+        (\lambda x_1. (\lambda f. x_1)))
+        \\ \rightarrow (((\lambda x_1. (\lambda f. x_1)) (\lambda t. (\lambda f. f))) 
+        (\lambda t. (\lambda f. t)))
+        \\ \rightarrow ((\lambda f. (\lambda t. (\lambda f. f))) (\lambda t. (\lambda f. t)))
+        \\ \rightarrow (\lambda t. (\lambda f. f))$ = \texttt{fls}
+    \end{enumerate}
+    \item Recall that with Church numerals...
+    \begin{enumerate}
+        \item write down a single $\lambda$-term for each of the following functions on natural numbers. You may not use aliases.
+        \begin{enumerate}
+            \item $n \mapsto 2n + 1$
+            
+            \texttt{inc} = $\lambda n. \lambda s. \lambda z. s(n(s)(z))$\\
+            \texttt{times} = $\lambda a. \lambda b. a(\texttt{pls}(b))(\texttt{c0})$\\
+            \texttt{pls} = $\lambda a. \lambda b. \lambda s. \lambda z. a(s)(b(s)(z))$\\
+
+            $\lambda n :  \texttt{inc}(  \texttt{times}(n)(\texttt{c2}))$
+
+            $\lambda n :  ($\lambda n. \lambda s. \lambda z. s(n(s)(z))$)
+            (  $\lambda a. \lambda b. a($\lambda a. \lambda b. \lambda s. \lambda z. a(s)(b(s)(z))$(b))(\lambda t.\lambda f.f)$(n)(\lambda s.\lambda z.s (s z)))$
+        
+            \item $n \mapsto 2^{n+1}$\\
+            
+            c2 = $\lambda s.\lambda z.s (s z)$
+            
+            $\lambda n :  \texttt{c2(inc($n$))}$
+
+
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+
+
+\end{document}
